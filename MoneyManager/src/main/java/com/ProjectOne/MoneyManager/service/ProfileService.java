@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,8 +34,10 @@ public class ProfileService {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-    final PasswordEncoder passwordEncoder;
+    @Autowired
     final AuthenticationManager authenticationManager;
 
     @Autowired
@@ -42,6 +45,10 @@ public class ProfileService {
 
     @Autowired
     AppUserDetailsService appUserDetailsService;
+
+    @Value("${app.activation.url}")
+    String activationURl;
+
 
     //Người dùng đăng ký tài khoản
     public ProfileDTO registerProfile(ProfileDTO profileDTO){
@@ -51,7 +58,7 @@ public class ProfileService {
         profileRepository.save(newProfileEntity);
 
         //Gửi email kích hoạt
-        String activationLink = "http://localhost:8080/api/v1.0/activate?token=" + newProfileEntity.getActivationToken();
+        String activationLink = activationURl + "api/v1.0/activate?token=" + newProfileEntity.getActivationToken();
         String subject = "Kích hoạt tài khoản email của bạn";
         String body = "Nhấp vào liên kết sau để kích hoạt của bạn: " + activationLink;
         emailService.sendEmail(newProfileEntity.getEmail(), subject, body);

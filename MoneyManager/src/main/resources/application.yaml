@@ -23,9 +23,20 @@ spring:
           from: "thanhnguyensonjqk@gmail.com"
       protocol: smtp
 
+  profiles:
+    active: prod #bỏ qua môi trường dev, dùng môi trường prod,tách biệt config local/test/prod
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
+money:
+  manager:
+    frontend:
+      url: ${MONEY_MANAGER_FRONTEND_URL}
+
+app:
+  activation:
+    url: ${MONEY_MANAGER_BACKEND_URL}
 
