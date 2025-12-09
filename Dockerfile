@@ -1,5 +1,13 @@
-FROM eclipse-temurin:21-jre
+# Stage 1: Build JAR
+FROM maven:3.9.0-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY target/MoneyManager-0.0.1-SNAPSHOT.jar MoneyManager-v1.0.jar
-EXPOSE 9090
-ENTRYPOINT ["java","-jar","MoneyManager-v1.0.jar"]
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/MoneyManager-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]
