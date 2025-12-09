@@ -50,7 +50,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET","PUT","DELETE","POST","OPTIONS"));
-//        configuration.setAllowedHeaders(List.of("Authorization","Content-type","Accept"));
+//      configuration.setAllowedHeaders(List.of("Authorization","Content-type","Accept"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -61,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // tắt tạm CORS
+                .cors(httpSecurityCors -> httpSecurityCors.configurationSource(corsConfigurationSource()))// tắt tạm CORS
                 .csrf(AbstractHttpConfigurer::disable) // tắt CSRF
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/status","/health","/register","/login")
