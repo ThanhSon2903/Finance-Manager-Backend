@@ -3,21 +3,15 @@ package com.ProjectOne.MoneyManager.config;
 import com.ProjectOne.MoneyManager.security.JwtRequestFilter;
 import com.ProjectOne.MoneyManager.service.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.tools.AbstractTrace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,7 +21,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-
 
 @Configuration
 @RequiredArgsConstructor
@@ -39,47 +32,54 @@ public class SecurityConfig {
     @Autowired
     JwtRequestFilter jwtRequestFilter;
 
+    // Danh sách API public — dùng chung cho dev/prod
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/status",
+            "/health",
+            "/register",
+            "/login"
+    };
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET","PUT","DELETE","POST","OPTIONS"));
-//      configuration.setAllowedHeaders(List.of("Authorization","Content-type","Accept"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .cors(httpSecurityCors -> httpSecurityCors.configurationSource(corsConfigurationSource()))// tắt tạm CORS
-                .csrf(AbstractHttpConfigurer::disable) // tắt CSRF
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/status","/health","/register","/login")
-                        .permitAll()//Chỉ mở những API có chứa tiền tố sau
-                        .anyRequest()//Còn không thì sẽ không thông qua
-                        .authenticated()
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
-
     @Bean
-    public AuthenticationManager authenticationManager(){
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();//Kiểm tra username + password
-        daoAuthenticationProvider.setUserDetailsService(appUserDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(daoAuthenticationProvider);//Quản lý các provider và thực hiện xác thực
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(appUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(provider);
     }
 }

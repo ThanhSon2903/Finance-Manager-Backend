@@ -58,7 +58,7 @@ public class ProfileService {
         profileRepository.save(newProfileEntity);
 
         //Gửi email kích hoạt
-        String activationLink = activationURl + "api/v1.0/activate?token=" + newProfileEntity.getActivationToken();
+        String activationLink = activationURl + " api/v1.0/activate?token=" + newProfileEntity.getActivationToken();
         String subject = "Kích hoạt tài khoản email của bạn";
         String body = "Nhấp vào liên kết sau để kích hoạt của bạn: " + activationLink;
         emailService.sendEmail(newProfileEntity.getEmail(), subject, body);

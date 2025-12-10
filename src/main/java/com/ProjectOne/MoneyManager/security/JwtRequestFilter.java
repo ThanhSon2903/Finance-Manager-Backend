@@ -20,25 +20,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @Autowired
-    AppUserDetailsService appUserDetailsService;
 
-    @Autowired
+    AppUserDetailsService appUserDetailsService;
     JwtUtil jwtUtil;
 
-
+    private static final Set<String> PUBLIC_ENDPOINTS = Set.of(
+            "/api/v1.0/register",
+            "/api/v1.0/login",
+            "/api/v1.0/status",
+            "/api/v1.0/health"
+    );
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        if(path.equals("/api/v1.0/register") || path.equals("/api/v1.0/login")
-                || path.equals("/status") || path.equals("/health")) {
+        if (PUBLIC_ENDPOINTS.contains(path)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,8 +50,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken;
         String userEmail;
 
-        if(authHeader == null || authHeader.isBlank()){
-            filterChain.doFilter(request,response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
         jwtToken = authHeader.substring(7);

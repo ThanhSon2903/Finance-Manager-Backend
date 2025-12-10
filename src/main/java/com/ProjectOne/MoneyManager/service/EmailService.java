@@ -18,20 +18,18 @@ public class EmailService {
     @Autowired
     JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.properties.mail.smtp.from}")
-    String fromEmail;
-
-    public void sendEmail(String to, String subject, String body){
+    private static final String FROM_EMAIL = "thanhnguyensonjqk@gmail.com";
+    public void sendEmail(String to, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
+            message.setFrom(FROM_EMAIL);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
+
             javaMailSender.send(message);
-        }
-        catch (Exception e){
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Email sending failed: " + e.getMessage());
         }
     }
 }

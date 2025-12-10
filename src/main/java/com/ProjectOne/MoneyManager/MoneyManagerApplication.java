@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class MoneyManagerApplication {
 
 	public static void main(String[] args) {
-		System.out.println("BACKEND_URL = " + System.getenv("MONEY_MANAGER_FRONTEND_URL"));
+		System.out.println("BACKEND_URL = " + System.getenv("MONEY_MANAGER_BACKEND_URL"));
 		SpringApplication.run(MoneyManagerApplication.class, args);
 	}
 

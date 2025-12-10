@@ -33,8 +33,8 @@ public class NotificationService {
     @Autowired
     ExpenseService expenseService;
 
-    @Value("${money.manager.frontend.url}")
-    String frontEndUrl;
+//    @Value("${money.manager.frontend.url}")
+//    String frontEndUrl;
 
     //Gửi thông báo tổng chi thu hàng ngày
     @Scheduled(cron = "0 0 11 * * *", zone = "Asia/Ho_Chi_Minh")
@@ -45,7 +45,7 @@ public class NotificationService {
 //            log.info(profile.getEmail());
             String body = "Hi " + profile.getFullName() + ", <br><br>"
                     + "This is a friendly reminder to add your incomes and expenses for today in Money Manager. <br><br>"
-                    + "<a href=\"" + frontEndUrl + "\" style=\"display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;font-weight:bold;\">Go to Money Manager</a>"
+                    + "<a href=\"" + "\" style=\"display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;font-weight:bold;\">Go to Money Manager</a>"
                     + "<br><br>Best regards,<br>Money Manager Team";
             emailService.sendEmail(profile.getEmail(),"Daily reminder: Add your income and expenses",body);
             log.info("Job completed: Send daily income expense reminder");
