@@ -1,21 +1,25 @@
-## Money Manager System
+## Money Manager System (The project is currently under development)
 
- Features (Project is being updated)
-- Add / update / delete, ... 
-- Category management
-- User profile support
-- Monthly reports
-- Send notification for expense, total income expense today to email user on 22h PM.
+ Features
+- CRUD operations for income and expense transactions
+- Category and user profile management
+- Monthly financial reports
+- Scheduled email notifications for daily expenses and income summary
+- Excel import/export for transaction data
 
 
 Technologies for Backend
-- Java Spring Boot
+- Java, Spring Boot
+- Spring Data JPA / Hibernate
 - MySQL
-- Spring Data JPA,JWT,Cloudinary,OAuth2
-- Brevo API
-- Hibernate
+- JWT & OAuth2 Authentication
+- Apache POI (Excel import/export)
+- Cloudinary (file storage)
+- Brevo API (email service)
 
-How to run
+Deloy on Render: https://build-money-manager-web.onrender.com/api/v1.0
+
+How to run in env Dev
 1. Clone project
 2. Configure database in `application.yaml`
 3. Run `mvn spring-boot:run`
