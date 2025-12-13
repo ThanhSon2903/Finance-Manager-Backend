@@ -3,7 +3,9 @@ package com.ProjectOne.MoneyManager.controller;
 import com.ProjectOne.MoneyManager.dto.AuthDTO;
 import com.ProjectOne.MoneyManager.dto.ProfileDTO;
 import com.ProjectOne.MoneyManager.service.ProfileService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProfileController {
 
     @Autowired
@@ -37,7 +40,7 @@ public class ProfileController {
             //Kiểm tra xem email này đã được kích hoạt hay chưa
             if(!profileService.isAccountActive(authDTO.getEmail())){
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
-                        "Thông báo","Tài khoản chưa được kích hoạt, Vui lòng kích hoạt tài khoản của bạn!"
+                        "Thông báo: ","Tài khoản chưa được kích hoạt, vui lòng kích hoạt tài khoản của bạn!"
                 ));
             }
             Map<String,Object> response = profileService.authenticateAndGenerateToken(authDTO);

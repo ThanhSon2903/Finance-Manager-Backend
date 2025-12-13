@@ -58,8 +58,8 @@ public class ProfileService {
         profileRepository.save(newProfileEntity);
 
         //Gửi email kích hoạt
-        String activationLink = activationURl + " api/v1.0/activate?token=" + newProfileEntity.getActivationToken();
-        String subject = "Kích hoạt tài khoản email của bạn";
+        String activationLink = activationURl + "/api/v1.0/activate?token=" + newProfileEntity.getActivationToken();
+        String subject = "Vui lòng kích hoạt tài khoản email của bạn!";
         String body = "Nhấp vào liên kết sau để kích hoạt của bạn: " + activationLink;
         emailService.sendEmail(newProfileEntity.getEmail(), subject, body);
 
@@ -92,20 +92,17 @@ public class ProfileService {
 
     //Kích hoạt tài khoản khi người dùng bấm vào link kích hoạt trong email
     public boolean activateProfile(String activationToken){
-        return profileRepository.findByActivationToken(activationToken)
-                .map(profileEntity -> {
-                    profileEntity.setIsActive(true);
-                    profileRepository.save(profileEntity);
-                    return true;
-                })
-                .orElse(false);
+        ProfileEntity profile =  profileRepository.findByActivationToken(activationToken).orElseThrow(() -> new RuntimeException("Activation Token không hợp lệ"));
+        profile.setIsActive(true);
+        profileRepository.save(profile);
+        return true;
     }
 
-    //kiểm tra xem tài khoản có hoạt động không
+    //kiểm tra xem tài khoản có kich hoat không
     public boolean isAccountActive(String email){
-        return profileRepository.findByEmail(email)
-                .map(ProfileEntity::getIsActive)
-                .orElse(false);
+        ProfileEntity profile = profileRepository.findByEmail(email).orElse(null);
+        if(profile == null) return false;
+        return profile.getIsActive();
     }
 
     //Lấy về hồ sơ người dùng đăng nhập hiện tại
@@ -115,7 +112,7 @@ public class ProfileService {
                 .orElseThrow(() -> new UsernameNotFoundException("Hồ sơ không tìm thấy với email: " + authentication.getName()));
     }
 
-    //1:45:17
+
     public ProfileDTO getPublicProfile(String email){
         ProfileEntity profileEntity = null;
         if(email == null){
