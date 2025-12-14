@@ -1,4 +1,4 @@
-## Money Manager System 
+## Finance Manager
 
  Features
 - CRUD operations for income and expense transactions
